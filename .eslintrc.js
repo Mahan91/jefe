@@ -1,4 +1,7 @@
 module.exports = {
+  globals: {
+    server: true,
+  },
   root: true,
   parserOptions: {
     ecmaVersion: 2018,
@@ -29,6 +32,7 @@ module.exports = {
     "prefer-rest-params": 0,
   },
   globals: {
+    server: true,
     'App': true,
   },
   overrides: [
