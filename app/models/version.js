@@ -11,7 +11,7 @@ export default DS.Model.extend({
   endDate: DS.attr('date'),
   legacyId: DS.attr('number'),
   position: DS.attr('number'),
-  numberOfPlaces: DS.attr('string'),
+  numberOfPlaces: DS.attr('number'),
   quotable: DS.attr('boolean'),
   prevarable: DS.attr('boolean'),
   firstQuoteAt: DS.attr('date'),
