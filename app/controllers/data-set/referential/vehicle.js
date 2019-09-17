@@ -6,6 +6,7 @@ export default Controller.extend({
   localizedReferentials: service(),
 
   queryParams: ['periodId'],
+  selectedPeriod: null,
   periodId: null,
 
   actions: {
