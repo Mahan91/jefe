@@ -7,6 +7,7 @@ export default Controller.extend({
 
   queryParams: ['periodId'],
   periodId: null,
+  selectedPeriod: null,
 
   actions: {
     updateSelectedPeriod(selectedPeriod) {
