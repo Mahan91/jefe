@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, it, done } from 'mocha';
+import { describe, it } from 'mocha';
 import { setupTest } from 'ember-mocha';
 import EmberObject from '@ember/object';
 
