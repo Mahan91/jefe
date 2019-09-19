@@ -3,7 +3,7 @@ import { describe, it } from 'mocha';
 import { setupTest } from 'ember-mocha';
 import EmberObject from '@ember/object';
 
-describe.only('Unit | Controller | data-set/referential/makes', function() {
+describe('Unit | Controller | data-set/referential/makes', function() {
   setupTest();
 
   describe('Computed filteredCategories', function() {
@@ -31,11 +31,11 @@ describe.only('Unit | Controller | data-set/referential/makes', function() {
           categories: [
             EmberObject.create({
               name: "category1",
-              showCategory: testCase.booleans[0]
+              showCategory: testCase.condition[0]
             }),
             EmberObject.create({
               name: "category2",
-              showCategory: testCase.booleans[1]
+              showCategory: testCase.condition[1]
             }),
           ],
         });
