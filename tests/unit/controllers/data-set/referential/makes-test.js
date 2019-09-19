@@ -3,10 +3,10 @@ import { describe, it } from 'mocha';
 import { setupTest } from 'ember-mocha';
 import EmberObject from '@ember/object';
 
-describe('Unit | Controller | data-set/referential/makes', function() {
+describe.only('Unit | Controller | data-set/referential/makes', function() {
   setupTest();
 
-  describe('Computed filteredCategories', function() {
+  describe('Computed | filteredCategories', function() {
     const testCases = [
       {
         message: 'No categories selected',
@@ -45,5 +45,55 @@ describe('Unit | Controller | data-set/referential/makes', function() {
         expect(controller.get('filteredCategories').mapBy('name')).to.members(testCase.result);
       })
     })
+  });
+
+  describe('Computed | filteredCategories', function() {
+    it('Computed | filteredMakesByCategory', async function() {
+      const category1 = EmberObject.create({
+        name: 'category1'
+      });
+      const category2 = EmberObject.create({
+        name: 'category2'
+      });
+      const categories = [
+        category1,
+        category2,
+      ];
+      const filteredCategories = [
+        category2,
+      ];
+      const modelTest = EmberObject.create({
+        makes: [
+          EmberObject.create({
+            name: "make1",
+            categories: new Promise(function (resolve) {
+              const makeCategories = [
+                category1,
+                category2
+              ]
+              resolve(makeCategories);
+            }),
+          }),
+          EmberObject.create({
+            name: "make2",
+            categories: new Promise(function (resolve) {
+              const makeCategories = [
+                category1,
+              ]
+              resolve(makeCategories);
+            }),
+          }),
+        ],
+      });
+      const makesNameExpectResult = ['make1'];
+
+      let controller = this.owner.lookup('controller:data-set/referential/makes');
+      controller.set('model', modelTest);
+      controller.set('filteredCategories', filteredCategories);
+
+      const filteredMakesByCategory = await controller.get('filteredMakesByCategory');
+      expect(filteredMakesByCategory.mapBy('name')).to.members(makesNameExpectResult);
+
+    });
   });
 });

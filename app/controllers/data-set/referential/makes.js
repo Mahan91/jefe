@@ -21,14 +21,14 @@ export default Controller.extend({
     return DS.PromiseArray.create({
       promise: filter(makes.toArray(), (make) => {
         const promise = make.get('categories').then((makeCategories) => {
-          let modelIsDisplayed = false;
+          let makeIsDisplayed = false;
           makeCategories.forEach((makeCategory) => {
             const makeCategoryName = makeCategory.get('name');
             if (filteredCategories.isAny('name', makeCategoryName)) {
-              modelIsDisplayed = true;
+              makeIsDisplayed = true;
             }
           });
-          return modelIsDisplayed;
+          return makeIsDisplayed;
         });
         return promise;
       }),
