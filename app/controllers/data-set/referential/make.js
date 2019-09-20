@@ -13,10 +13,10 @@ export default Controller.extend({
     return categories.sortBy('name');
   }),
 
-  filteredCategories: computed('model.make.categories.@each.showCategory', function () {
+  filteredCategories: computed('model.make.categories.@each.isSelected', function () {
     const categories = this.get('model.make.categories');
-    if (categories.isAny('showCategory')) {
-      return categories.filterBy('showCategory');
+    if (categories.isAny('isSelected')) {
+      return categories.filterBy('isSelected');
     }
     return categories;
   }),

@@ -31,11 +31,11 @@ describe.only('Unit | Controller | data-set/referential/makes', function() {
           categories: [
             EmberObject.create({
               name: "category1",
-              showCategory: testCase.condition[0]
+              isSelected: testCase.condition[0]
             }),
             EmberObject.create({
               name: "category2",
-              showCategory: testCase.condition[1]
+              isSelected: testCase.condition[1]
             }),
           ],
         });

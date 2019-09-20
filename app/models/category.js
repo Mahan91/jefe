@@ -11,7 +11,7 @@ export default DS.Model.extend(HasManyQuery.ModelMixin, {
 
 
   // Property to manage filters of submodels view
-  showCategory: false,
+  isSelected: false,
   categoryInputId: computed('id', function () {
     const categoryId = this.get('id');
     return `category-${categoryId}`;
