@@ -40,11 +40,15 @@ export default Controller.extend({
 
   filteredMakes: computed('filteredMakesByCategories.content', 'searchTerm', function () {
     const makes = this.get('filteredMakesByCategories.content');
-    if (!makes) {
-      return [];
-    }
-    const searchTerm = this.get('searchTerm').toLowerCase();
-    return makes.filter((make) => (make.get('name').toLowerCase().indexOf(searchTerm) > -1));
+    const searchTerm = this.get('searchTerm');
+    if (!makes) { return []; }
+    if (searchTerm === '') { return makes; }
+    return this._filterMakeBySearchTerm(makes, searchTerm);
   }),
+
+  _filterMakeBySearchTerm(makes, searchTerm) {
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    return makes.filter((make) => (make.get('name').toLowerCase().indexOf(lowerCaseSearchTerm) > -1));
+  },
 
 });
