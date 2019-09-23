@@ -33,6 +33,7 @@ export default Controller.extend({
       const makeCategoryName = makeCategory.get('name');
       if (previousValue) { return true; }
       if (selectedCategories.isAny('name', makeCategoryName)) { return true; }
+
       return false;
     }, false);
   },

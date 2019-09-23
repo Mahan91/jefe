@@ -47,53 +47,47 @@ describe.only('Unit | Controller | data-set/referential/makes', function() {
     })
   });
 
-  describe('Computed | filteredMakesByCategories', function() {
-    it('Computed | filteredMakesByCategory', async function() {
-      const category1 = EmberObject.create({
-        name: 'category1'
-      });
-      const category2 = EmberObject.create({
-        name: 'category2'
-      });
-      const categories = [
-        category1,
-        category2,
-      ];
-      const filteredCategories = [
-        category2,
-      ];
-      const modelTest = EmberObject.create({
-        makes: [
-          EmberObject.create({
-            name: "make1",
-            categories: new Promise(function (resolve) {
-              const makeCategories = [
-                category1,
-                category2
-              ]
-              resolve(makeCategories);
-            }),
-          }),
-          EmberObject.create({
-            name: "make2",
-            categories: new Promise(function (resolve) {
-              const makeCategories = [
-                category1,
-              ]
-              resolve(makeCategories);
-            }),
-          }),
+  describe('Function | _checkMakeCategories', function() {
+    const category1 = EmberObject.create({
+      name: 'category1'
+    });
+    const category2 = EmberObject.create({
+      name: 'category2'
+    });
+
+    const testCases = [
+      {
+        message: 'No category match',
+        selectedCategories: [
+          category1,
         ],
+        result: false,
+      },
+      {
+        message: 'Category match',
+        selectedCategories: [
+          category1,
+          category2,
+        ],
+        result: true,
+      }
+    ];
+    testCases.forEach((testCase) => {
+      it(testCase.message, async function() {
+        const make = EmberObject.create({
+          categories: new Promise(function (resolve) {
+            const makeCategories = [
+              category2,
+            ]
+            resolve(makeCategories);
+          }),
+        });
+
+        let controller = this.owner.lookup('controller:data-set/referential/makes');
+
+        const isCategoryMatching = await controller._checkMakeCategories(make, testCase.selectedCategories);
+        expect(isCategoryMatching).to.equal(testCase.result);
       });
-      const makesNameExpectResult = ['make1'];
-
-      let controller = this.owner.lookup('controller:data-set/referential/makes');
-      controller.set('model', modelTest);
-      controller.set('selectedCategories', filteredCategories);
-
-      const filteredMakesByCategory = await controller.get('filteredMakesByCategories');
-      expect(filteredMakesByCategory.mapBy('name')).to.members(makesNameExpectResult);
-
     });
   });
 });
