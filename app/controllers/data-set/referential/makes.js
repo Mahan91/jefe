@@ -14,29 +14,31 @@ export default Controller.extend({
     return categories;
   }),
 
-  filteredMakesByCategory: computed('selectedCategories', 'model.makes', function () {
-    const makes = this.get('model.makes');
+  filteredMakesByCategories: computed('selectedCategories', 'model.makes', function () {
+    const makes = this.get('model.makes').toArray();
     const selectedCategories = this.get('selectedCategories');
     return DS.PromiseArray.create({
-      promise: filter(makes.toArray(), (make) => {
-        // Create Function
-        const promise = make.get('categories').then((makeCategories) => {
-          let makeIsDisplayed = false;
-          makeCategories.forEach((makeCategory) => {
-            const makeCategoryName = makeCategory.get('name');
-            if (selectedCategories.isAny('name', makeCategoryName)) {
-              makeIsDisplayed = true;
-            }
-          });
-          return makeIsDisplayed;
-        });
-        return promise;
-      }),
+      promise: filter(makes, (make) => this._checkMakeCategories(make, selectedCategories)),
     });
   }),
 
-  filteredMakes: computed('filteredMakesByCategory.content', 'searchTerm', function () {
-    const makes = this.get('filteredMakesByCategory.content');
+  async _checkMakeCategories(make, selectedCategories) {
+    let makeCategories;
+    try {
+      makeCategories = await make.get('categories');
+    } catch (e) {
+      throw e;
+    }
+    return makeCategories.reduce((previousValue, makeCategory) => {
+      const makeCategoryName = makeCategory.get('name');
+      if (previousValue) { return true; }
+      if (selectedCategories.isAny('name', makeCategoryName)) { return true; }
+      return false;
+    }, false);
+  },
+
+  filteredMakes: computed('filteredMakesByCategories.content', 'searchTerm', function () {
+    const makes = this.get('filteredMakesByCategories.content');
     if (!makes) {
       return [];
     }

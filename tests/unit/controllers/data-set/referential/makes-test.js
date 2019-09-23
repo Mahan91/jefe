@@ -47,7 +47,7 @@ describe.only('Unit | Controller | data-set/referential/makes', function() {
     })
   });
 
-  describe('Computed | filteredMakesByCategory', function() {
+  describe('Computed | filteredMakesByCategories', function() {
     it('Computed | filteredMakesByCategory', async function() {
       const category1 = EmberObject.create({
         name: 'category1'
@@ -91,7 +91,7 @@ describe.only('Unit | Controller | data-set/referential/makes', function() {
       controller.set('model', modelTest);
       controller.set('selectedCategories', filteredCategories);
 
-      const filteredMakesByCategory = await controller.get('filteredMakesByCategory');
+      const filteredMakesByCategory = await controller.get('filteredMakesByCategories');
       expect(filteredMakesByCategory.mapBy('name')).to.members(makesNameExpectResult);
 
     });

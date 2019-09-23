@@ -27,6 +27,7 @@ module.exports = {
     "import/no-extraneous-dependencies": 0,
     "no-underscore-dangle": 0,
     "prefer-rest-params": 0,
+    "no-useless-catch": 0,
   },
   globals: {
     'App': true,
