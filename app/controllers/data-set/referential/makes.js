@@ -7,16 +7,16 @@ export default Controller.extend({
   queryParams: ['searchTerm'],
   searchTerm: '',
 
-  filteredCategories: computed('model.categories.@each.isSelected', function () {
+  selectedCategories: computed('model.categories.@each.isSelected', function () {
     const categories = this.get('model.categories');
     if (categories.isAny('isSelected')) { return categories.filterBy('isSelected'); }
 
     return categories;
   }),
 
-  filteredMakesByCategory: computed('filteredCategories', 'model.makes', function () {
+  filteredMakesByCategory: computed('selectedCategories', 'model.makes', function () {
     const makes = this.get('model.makes');
-    const filteredCategories = this.get('filteredCategories');
+    const selectedCategories = this.get('selectedCategories');
     return DS.PromiseArray.create({
       promise: filter(makes.toArray(), (make) => {
         // Create Function
@@ -24,7 +24,7 @@ export default Controller.extend({
           let makeIsDisplayed = false;
           makeCategories.forEach((makeCategory) => {
             const makeCategoryName = makeCategory.get('name');
-            if (filteredCategories.isAny('name', makeCategoryName)) {
+            if (selectedCategories.isAny('name', makeCategoryName)) {
               makeIsDisplayed = true;
             }
           });

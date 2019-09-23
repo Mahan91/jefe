@@ -6,7 +6,7 @@ import EmberObject from '@ember/object';
 describe.only('Unit | Controller | data-set/referential/makes', function() {
   setupTest();
 
-  describe('Computed | filteredCategories', function() {
+  describe('Computed | selectedCategories', function() {
     const testCases = [
       {
         message: 'No categories selected',
@@ -42,12 +42,12 @@ describe.only('Unit | Controller | data-set/referential/makes', function() {
         let controller = this.owner.lookup('controller:data-set/referential/makes');
         controller.set('model', modelTest);
 
-        expect(controller.get('filteredCategories').mapBy('name')).to.members(testCase.result);
+        expect(controller.get('selectedCategories').mapBy('name')).to.members(testCase.result);
       })
     })
   });
 
-  describe('Computed | filteredCategories', function() {
+  describe('Computed | filteredMakesByCategory', function() {
     it('Computed | filteredMakesByCategory', async function() {
       const category1 = EmberObject.create({
         name: 'category1'
@@ -89,7 +89,7 @@ describe.only('Unit | Controller | data-set/referential/makes', function() {
 
       let controller = this.owner.lookup('controller:data-set/referential/makes');
       controller.set('model', modelTest);
-      controller.set('filteredCategories', filteredCategories);
+      controller.set('selectedCategories', filteredCategories);
 
       const filteredMakesByCategory = await controller.get('filteredMakesByCategory');
       expect(filteredMakesByCategory.mapBy('name')).to.members(makesNameExpectResult);
