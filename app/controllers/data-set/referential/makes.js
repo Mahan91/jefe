@@ -43,9 +43,8 @@ export default Controller.extend({
     if (!makes) {
       return [];
     }
-    const searchTerm = this.get('searchTerm');
-    const filteredMakes = makes.filter((make) => (make.get('name').toLowerCase().indexOf(searchTerm) > -1));
-    return filteredMakes;
+    const searchTerm = this.get('searchTerm').toLowerCase();
+    return makes.filter((make) => (make.get('name').toLowerCase().indexOf(searchTerm) > -1));
   }),
 
 });
