@@ -1,12 +1,13 @@
-import { module, test } from 'qunit';
-import { setupTest } from 'ember-qunit';
+import { expect } from 'chai';
+import { describe, it } from 'mocha';
+import { setupTest } from 'ember-mocha';
 
-module('Unit | Controller | data-set/referential/make', function(hooks) {
-  setupTest(hooks);
+describe.only('Unit | Controller | data-set/referential/make', function() {
+  setupTest();
 
   // Replace this with your real tests.
-  test('it exists', function(assert) {
+  it('exists', function() {
     let controller = this.owner.lookup('controller:data-set/referential/make');
-    assert.ok(controller);
+    expect(controller).to.be.ok;
   });
 });
