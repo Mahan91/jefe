@@ -8,25 +8,22 @@ import { inject as service } from '@ember/service';
 export default Controller.extend({
   localizedReferentials: service(),
 
-  sortedCategories: computed('model.make.categories', function () {
-    const categories = this.get('model.make.categories');
-    return categories.sortBy('name');
-  }),
+  categoriesSorting: Object.freeze(['name', 'asc']),
+  sortedCategories: sort('model.make.categories', 'categoriesSorting'),
 
-  filteredCategories: computed('model.make.categories.@each.isSelected', function () {
+  selectedCategories: computed('model.make.categories.@each.isSelected', function () {
     const categories = this.get('model.make.categories');
-    if (categories.isAny('isSelected')) {
-      return categories.filterBy('isSelected');
-    }
+    if (categories.isAny('isSelected')) { return categories.filterBy('isSelected'); }
+
     return categories;
   }),
 
   productionFilter: false,
 
-  filteredModels: computed('filteredCategories', 'model.make.models.category', 'productionFilter', function () {
+  filteredModels: computed('selectedCategories', 'model.make.models.category', 'productionFilter', function () {
     const makeModels = this.get('model.make.models');
     const productionFilter = this.get('productionFilter');
-    const filteredCategories = this.get('filteredCategories');
+    const selectedCategories = this.get('selectedCategories');
 
     return DS.PromiseArray.create({
       promise: filter(makeModels.toArray(), (makeModel) => {
@@ -36,7 +33,7 @@ export default Controller.extend({
           if (!productionFilter || (productionFilter && isInProduction)) {
             modelCategories.forEach((modelCategory) => {
               const modelCategoryName = modelCategory.get('name');
-              if (filteredCategories.isAny('name', modelCategoryName)) {
+              if (selectedCategories.isAny('name', modelCategoryName)) {
                 modelIsDisplayed = true;
               }
             });
@@ -48,10 +45,10 @@ export default Controller.extend({
     });
   }),
 
-  filteredSubmodels: computed('filteredCategories', 'model.make.submodels.category', 'productionFilter', function () {
+  filteredSubmodels: computed('selectedCategories', 'model.make.submodels.category', 'productionFilter', function () {
     const makeSubmodels = this.get('model.make.submodels');
     const productionFilter = this.get('productionFilter');
-    const filteredCategories = this.get('filteredCategories');
+    const selectedCategories = this.get('selectedCategories');
 
     return DS.PromiseArray.create({
       promise: filter(makeSubmodels.toArray(), (makeSubmodel) => {
@@ -59,7 +56,7 @@ export default Controller.extend({
         const promise = makeSubmodel.get('category').then((submodelCategory) => {
           if (!productionFilter || (productionFilter && isInProduction)) {
             const submodelCategoryName = submodelCategory.get('name');
-            return filteredCategories.isAny('name', submodelCategoryName);
+            return selectedCategories.isAny('name', submodelCategoryName);
           }
           return false;
         });
