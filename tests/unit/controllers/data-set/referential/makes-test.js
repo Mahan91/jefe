@@ -3,7 +3,7 @@ import { describe, it } from 'mocha';
 import { setupTest } from 'ember-mocha';
 import EmberObject from '@ember/object';
 
-describe.only('Unit | Controller | data-set/referential/makes', function() {
+describe('Unit | Controller | data-set/referential/makes', function() {
   setupTest();
 
   describe('Computed | selectedCategories', function() {
@@ -88,6 +88,37 @@ describe.only('Unit | Controller | data-set/referential/makes', function() {
         const isCategoryMatching = await controller._checkMakeCategories(make, testCase.selectedCategories);
         expect(isCategoryMatching).to.equal(testCase.result);
       });
+    });
+  });
+
+  describe('Function | _filterMakeBySearchTerm', function() {
+    const testCases = [
+      {
+        message: 'No matching term',
+        searchTerm: 'Azerty',
+        result: [],
+      },
+      {
+        message: 'Matching term',
+        searchTerm: 'Rena',
+        result: ['renault'],
+      },
+    ];
+    testCases.forEach((testCase) => {
+      it(testCase.message, function(){
+        const makes = [
+          EmberObject.create({
+            name: 'peugeot',
+          }),
+          EmberObject.create({
+            name: 'renault',
+          }),
+        ];
+        let controller = this.owner.lookup('controller:data-set/referential/makes');
+        const searchTermMatch = controller._filterMakeBySearchTerm(makes, testCase.searchTerm);
+
+        expect(searchTermMatch.mapBy('name')).to.members(testCase.result);
+      })
     });
   });
 });
