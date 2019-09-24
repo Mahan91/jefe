@@ -22,48 +22,62 @@ export default Controller.extend({
 
   filteredModels: computed('selectedCategories', 'model.make.models.category', 'productionFilter', function () {
     const makeModels = this.get('model.make.models');
-    const productionFilter = this.get('productionFilter');
     const selectedCategories = this.get('selectedCategories');
+    const productionFilter = this.get('productionFilter');
 
     return DS.PromiseArray.create({
       promise: filter(makeModels.toArray(), (makeModel) => {
-        const isInProduction = !makeModel.get('endDate');
-        const promise = makeModel.get('categories').then((modelCategories) => {
-          let modelIsDisplayed = false;
-          if (!productionFilter || (productionFilter && isInProduction)) {
-            modelCategories.forEach((modelCategory) => {
-              const modelCategoryName = modelCategory.get('name');
-              if (selectedCategories.isAny('name', modelCategoryName)) {
-                modelIsDisplayed = true;
-              }
-            });
-          }
-          return modelIsDisplayed;
-        });
-        return promise;
+        if (this._filterByProductionEndDate(makeModel, productionFilter)) { return false; }
+        return this._filterByModelCategories(makeModel, selectedCategories);
       }),
     });
   }),
 
   filteredSubmodels: computed('selectedCategories', 'model.make.submodels.category', 'productionFilter', function () {
     const makeSubmodels = this.get('model.make.submodels');
-    const productionFilter = this.get('productionFilter');
     const selectedCategories = this.get('selectedCategories');
+    const productionFilter = this.get('productionFilter');
 
     return DS.PromiseArray.create({
       promise: filter(makeSubmodels.toArray(), (makeSubmodel) => {
-        const isInProduction = !makeSubmodel.get('endDate');
-        const promise = makeSubmodel.get('category').then((submodelCategory) => {
-          if (!productionFilter || (productionFilter && isInProduction)) {
-            const submodelCategoryName = submodelCategory.get('name');
-            return selectedCategories.isAny('name', submodelCategoryName);
-          }
-          return false;
-        });
-        return promise;
+        if (this._filterByProductionEndDate(makeSubmodel, productionFilter)) { return false; }
+        return this._filterBySubModelCategory(makeSubmodel, selectedCategories);
       }),
     });
   }),
+
+  _filterByProductionEndDate(model, productionFilter) {
+    return productionFilter && model.get('endDate');
+  },
+
+  async _filterByModelCategories(model, selectedCategories) {
+    let modelCategories;
+    try {
+      modelCategories = await model.get('categories');
+    } catch (e) {
+      throw e;
+    }
+
+    return modelCategories.reduce((previousValue, modelCategory) => {
+      const modelCategoryName = modelCategory.get('name');
+      if (previousValue) { return true; }
+      if (selectedCategories.isAny('name', modelCategoryName)) { return true; }
+
+      return false;
+    }, false);
+  },
+
+  async _filterBySubModelCategory(model, selectedCategories) {
+    let submodelCategory;
+    try {
+      submodelCategory = await model.get('category');
+    } catch (e) {
+      throw e;
+    }
+
+    const submodelCategoryName = submodelCategory.get('name');
+    return selectedCategories.isAny('name', submodelCategoryName);
+  },
 
   // Models sorting
   sortProperty: 'name',
