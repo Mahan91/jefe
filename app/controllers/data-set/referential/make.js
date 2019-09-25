@@ -28,7 +28,7 @@ export default Controller.extend({
     return DS.PromiseArray.create({
       promise: filter(makeModels.toArray(), (makeModel) => {
         if (this._filterByProductionEndDate(makeModel, productionFilter)) { return false; }
-        return this._filterModelByCategories(makeModel, selectedCategories);
+        return this._checkModelCategories(makeModel, selectedCategories);
       }),
     });
   }),
@@ -41,16 +41,17 @@ export default Controller.extend({
     return DS.PromiseArray.create({
       promise: filter(makeSubmodels.toArray(), (makeSubmodel) => {
         if (this._filterByProductionEndDate(makeSubmodel, productionFilter)) { return false; }
-        return this._filterSubModelByCategory(makeSubmodel, selectedCategories);
+        return this._checkSubmodelCategory(makeSubmodel, selectedCategories);
       }),
     });
   }),
 
   _filterByProductionEndDate(model, productionFilter) {
-    return productionFilter && model.get('endDate');
+    if(productionFilter && model.get('endDate')) { return true; }
+    return false;
   },
 
-  async _filterModelByCategories(model, selectedCategories) {
+  async _checkModelCategories(model, selectedCategories) {
     let modelCategories;
     try {
       modelCategories = await model.get('categories');
@@ -67,7 +68,7 @@ export default Controller.extend({
     }, false);
   },
 
-  async _filterSubModelByCategory(model, selectedCategories) {
+  async _checkSubmodelCategory(model, selectedCategories) {
     let submodelCategory;
     try {
       submodelCategory = await model.get('category');
