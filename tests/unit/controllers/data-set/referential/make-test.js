@@ -128,46 +128,46 @@ describe.only('Unit | Controller | data-set/referential/make', function() {
         expect(isCategoryMatching).to.equal(testCase.result);
       });
     });
+  });
 
-    describe('Function | _checkModelCategories', function() {
-      const category1 = EmberObject.create({
-        name: 'category1'
-      });
-      const category2 = EmberObject.create({
-        name: 'category2'
-      });
+  describe('Function | _checkSubmodelCategory', function() {
+    const category1 = EmberObject.create({
+      name: 'category1'
+    });
+    const category2 = EmberObject.create({
+      name: 'category2'
+    });
 
-      const testCases = [
-        {
-          message: 'No category match',
-          selectedCategories: [
-            category1,
-          ],
-          result: false,
-        },
-        {
-          message: 'Category match',
-          selectedCategories: [
-            category1,
-            category2,
-          ],
-          result: true,
-        }
-      ];
-      testCases.forEach((testCase) => {
-        it(testCase.message, async function() {
-          const submodel = EmberObject.create({
-            category: new Promise(function (resolve) {
-              const submodelCategory = category2;
-              resolve(submodelCategory);
-            }),
-          });
-
-          let controller = this.owner.lookup('controller:data-set/referential/make');
-
-          const isCategoryMatching = await controller._checkSubmodelCategory(submodel, testCase.selectedCategories);
-          expect(isCategoryMatching).to.equal(testCase.result);
+    const testCases = [
+      {
+        message: 'No category match',
+        selectedCategories: [
+          category1,
+        ],
+        result: false,
+      },
+      {
+        message: 'Category match',
+        selectedCategories: [
+          category1,
+          category2,
+        ],
+        result: true,
+      }
+    ];
+    testCases.forEach((testCase) => {
+      it(testCase.message, async function() {
+        const submodel = EmberObject.create({
+          category: new Promise(function (resolve) {
+            const submodelCategory = category2;
+            resolve(submodelCategory);
+          }),
         });
+
+        let controller = this.owner.lookup('controller:data-set/referential/make');
+
+        const isCategoryMatching = await controller._checkSubmodelCategory(submodel, testCase.selectedCategories);
+        expect(isCategoryMatching).to.equal(testCase.result);
       });
     });
   });
