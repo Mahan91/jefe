@@ -56,6 +56,7 @@ export default Controller.extend({
         {
           filteredProp: 'trimLevel',
           activesFilters: this.get('trimLevelOptions').filterBy('isActive', true),
+          isBelongTo: false,
         },
         {
           filteredProp: 'gearbox',
@@ -65,12 +66,14 @@ export default Controller.extend({
         {
           filteredProp: 'lastTransmission.content.id',
           activesFilters: this.get('transmissionOptions').filterBy('isActive', true),
+          isBelongTo: false,
         },
       ];
       if (this.get('engineOptions.length')) {
         filters.pushObject({
           filteredProp: 'lastEngine.content.id',
           activesFilters: this.get('engineOptions').filterBy('isActive', true),
+          isBelongTo: false,
         });
       } else {
         filters.pushObject({
@@ -79,21 +82,21 @@ export default Controller.extend({
           isBelongTo: true,
         });
       }
-      return versionsArray.filter((version) => {
-        let displayVersion = true;
-        filters.forEach((filter) => {
-          if (filter.activesFilters.length && displayVersion) {
-            if (filter.isBelongTo) {
-              displayVersion = filter.activesFilters.isAny('id', version.belongsTo(filter.filteredProp).id());
-            } else {
-              displayVersion = filter.activesFilters.isAny('id', version.get(filter.filteredProp));
-            }
-          }
-        });
-        return displayVersion;
-      });
+      return versionsArray.filter((version) => this._checkIfVersionIsDisplay(version, filters));
     },
   ),
+
+  _checkIfVersionIsDisplay(version, filters) {
+    if (filters.isEvery('activesFilters.length', 0)) { return true; }
+
+    return filters.reduce((previousValue, filter) => {
+      if (!previousValue) { return false; }
+      if (filter.activesFilters.length === 0) { return true; }
+      if (filter.isBelongTo) { return filter.activesFilters.isAny('id', version.belongsTo(filter.filteredProp).id()); }
+
+      return filter.activesFilters.isAny('id', version.get(filter.filteredProp));
+    }, true);
+  },
 
   trimLevelOptions: computed('model.trimLevels', function () {
     const trimLevels = this.get('model.trimLevels') || [];
@@ -124,38 +127,44 @@ export default Controller.extend({
       const secondaryPropValue = secondaryProp ? item.get(secondaryProp) : null;
       const filterName = secondaryPropValue ? `${item.get(primaryProp)} -- ${secondaryPropValue}` : item.get(primaryProp);
       const filterIsActive = queryParamName ? this.get(queryParamName).indexOf(item.get('id')) !== -1 : false;
-      let filter = EmberObject.extend({
+
+      const filter = EmberObject.extend({
         id: item.get('id'),
         name: filterName,
         inputId: `${item.get(primaryProp)}-${item.get('id')}`,
         isActive: filterIsActive,
       });
-      if (item.get('constructor.modelName') === 'engine') {
-        filter = filter.extend({
-          energyId: item.belongsTo('energy').id(),
-        });
-      }
-      if (item.get('constructor.modelName') === 'energy') {
-        const engineOptions = this.get('engineOptions');
-        if (engineOptions.length) {
-          filter = filter.extend({
-            isActive: computed('engineOptions.@each.isActive', function () {
-              return this.get('engineOptions').isEvery('isActive', true);
-            }),
-            isIndeterminate: computed('engineOptions.@each.isActive', 'isActive', function () {
-              const isActive = this.get('isActive');
-              if (isActive) {
-                return false;
-              }
-              return this.get('engineOptions').isAny('isActive', true);
-            }),
-            engineOptions: ArrayProxy.create({
-              content: engineOptions.filter((engineOption) => engineOption.get('energyId') === item.get('id')),
-            }),
-          });
-        }
-      }
+
+      if (item.get('constructor.modelName') === 'engine') { return this._linkEngineToEnergy(filter, item).create(); }
+      if (item.get('constructor.modelName') === 'energy') { return this._linkEnergyToEngines(filter, item).create(); }
+
       return filter.create();
     }).sortBy('name');
   },
+
+  _linkEngineToEnergy(engineFilter, engineRecord) {
+    return engineFilter.extend({
+      energyId: engineRecord.belongsTo('energy').id(),
+    });
+  },
+
+  _linkEnergyToEngines(energyFilter, energyRecord) {
+    const engineOptions = this.get('engineOptions');
+    return energyFilter.extend({
+      isActive: computed('engineOptions.@each.isActive', function () {
+        return this.get('engineOptions').isEvery('isActive', true);
+      }),
+      isIndeterminate: computed('engineOptions.@each.isActive', 'isActive', function () {
+        const isActive = this.get('isActive');
+        if (isActive) {
+          return false;
+        }
+        return this.get('engineOptions').isAny('isActive', true);
+      }),
+      engineOptions: ArrayProxy.create({
+        content: engineOptions.filter((engineOption) => engineOption.get('energyId') === energyRecord.get('id')),
+      }),
+    });
+  },
+
 });
