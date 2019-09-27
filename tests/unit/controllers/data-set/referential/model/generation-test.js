@@ -1,12 +1,13 @@
-import { module, test } from 'qunit';
-import { setupTest } from 'ember-qunit';
+import { expect } from 'chai';
+import { describe, it } from 'mocha';
+import { setupTest } from 'ember-mocha';
 
-module('Unit | Controller | data-set/referential/model/generation', function(hooks) {
-  setupTest(hooks);
+describe('Unit | Controller | data-set/referential/model/generation', function() {
+  setupTest();
 
   // Replace this with your real tests.
-  test('it exists', function(assert) {
+  it('exists', function() {
     let controller = this.owner.lookup('controller:data-set/referential/model/generation');
-    assert.ok(controller);
+    expect(controller).to.be.ok;
   });
 });
