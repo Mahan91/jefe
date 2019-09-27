@@ -47,7 +47,7 @@ export default Controller.extend({
   }),
 
   _filterByProductionEndDate(model, productionFilter) {
-    if(productionFilter && model.get('endDate')) { return true; }
+    if (productionFilter && model.get('endDate')) { return true; }
     return false;
   },
 
