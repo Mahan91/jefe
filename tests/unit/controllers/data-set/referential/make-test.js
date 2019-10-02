@@ -3,7 +3,7 @@ import { describe, it } from 'mocha';
 import { setupTest } from 'ember-mocha';
 import EmberObject from '@ember/object';
 
-describe.only('Unit | Controller | data-set/referential/make', function() {
+describe('Unit | Controller | data-set/referential/make', function() {
   setupTest();
 
   describe('Computed | selectedCategories', function() {

@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupTest } from 'ember-mocha';
 
-describe('Unit | Controller | data-set/referential/model/generation/phase', function() {
+describe.only('Unit | Controller | data-set/referential/model/generation/phase', function() {
   setupTest();
 
   // Replace this with your real tests.

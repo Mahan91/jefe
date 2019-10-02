@@ -4,6 +4,7 @@ export default DS.Model.extend({
   boreAndStroke: DS.attr('string'),
   compressionRatio: DS.attr('string'),
   dinHorsepower: DS.attr('number'),
+  saeHorsepower: DS.attr('number'),
   acronym: DS.attr('string'),
   configuration: DS.attr('string'),
   cubicCapacity: DS.attr('number'),
