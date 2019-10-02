@@ -55,36 +55,44 @@ export default Controller.extend({
 
   trimLevelOptions: computed('model.trimLevels', function () {
     const trimLevels = this.get('model.trimLevels') || [];
-    return this._generateFilterOptions(trimLevels, ['name'], 'trimLevels');
+    return this._generateFilterOptions(trimLevels, ['name'], [], 'trimLevels');
   }),
   engineOptions: computed('model.engines', function () {
     const engines = this.get('model.engines') || [];
-    return this._generateFilterOptions(engines, ['marketName', 'dinHorsepower', 'saeHorsepower', 'standardEmission'], 'engines');
+    return this._generateFilterOptions(engines, ['marketName', 'standardEmission'], ['dinHorsepower', 'saeHorsepower'], 'engines');
   }),
   energyOptions: computed('model.energies', 'engineOptions', function () {
     const energies = this.get('model.energies') || [];
-    return this._generateFilterOptions(energies, ['name'], 'energies');
+    return this._generateFilterOptions(energies, ['name'], [], 'energies');
   }),
   gearboxOptions: computed('model.gearboxes', function () {
     const gearboxes = this.get('model.gearboxes') || [];
-    return this._generateFilterOptions(gearboxes, ['name', 'subtype', 'numberOfGears'], 'gearboxes');
+    return this._generateFilterOptions(gearboxes, ['name'], ['subtype', 'numberOfGears'], 'gearboxes');
   }),
   transmissionOptions: computed('model.transmissions', function () {
     const transmissions = this.get('model.transmissions') || [];
-    return this._generateFilterOptions(transmissions, ['drivenWheels', 'marketingName'], 'transmissions');
+    return this._generateFilterOptions(transmissions, ['drivenWheels', 'marketingName'], [], 'transmissions');
   }),
 
-  _generateFilterOptions(filtersRecordsArray, namingProperties, queryParamName) {
+  _generateFilterOptions(
+    filtersRecordsArray,
+    primaryNamingProperties,
+    secondaryNamingProperties,
+    queryParamName,
+  ) {
     return filtersRecordsArray.map((filterRecord) => {
       const filterRecordType = filterRecord.get('constructor.modelName');
-      const filterName = this._generateFilterName(filterRecord, namingProperties);
-      const filterIsActive = queryParamName ? this.get(queryParamName).indexOf(filterRecord.get('id')) !== -1 : false;
+      const filterRecordId = filterRecord.get('id');
 
       const filter = EmberObject.extend({
-        id: filterRecord.get('id'),
-        name: filterName,
-        inputId: `${filterRecordType}-${filterRecord.get('id')}`,
-        isActive: filterIsActive,
+        id: filterRecordId,
+        name: this._selectFilterName(
+          filterRecord,
+          primaryNamingProperties,
+          secondaryNamingProperties,
+        ),
+        inputId: `${filterRecordType}-${filterRecordId}`,
+        isActive: this.get(queryParamName).isAny(filterRecordId),
       });
 
       if (filterRecordType === 'engine') { return this._linkEngineToEnergy(filter, filterRecord).create(); }
@@ -92,6 +100,12 @@ export default Controller.extend({
 
       return filter.create();
     }).sortBy('name');
+  },
+
+  _selectFilterName(filterRecord, primaryNamingProperties, secondaryNamingProperties) {
+    const filterName = this._generateFilterName(filterRecord, primaryNamingProperties);
+    if (filterName) { return filterName; }
+    return this._generateFilterName(filterRecord, secondaryNamingProperties);
   },
 
   _generateFilterName(filterRecord, namingProperties) {
